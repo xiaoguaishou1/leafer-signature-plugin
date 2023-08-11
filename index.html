@@ -1,0 +1,30 @@
+<!--
+ * @Author: panghu 760695955@qq.com
+ * @Date: 2023-08-10 13:28:49
+ * @LastEditors: panghu 760695955@qq.com
+ * @LastEditTime: 2023-08-11 21:06:27
+ * @FilePath: /leafer-board-plugin/index.html
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>电子签名版-基于Leaferjs</title>
+  </head>
+  <body>
+    <div id="app" style="display: flex">
+      <canvas id="board" style="background-color: black"></canvas>
+      <div>
+        <button id="clear">清除签名板</button>
+        <button id="undo">退回上一步</button>
+        <button id="sava">保存图片/base64...</button>
+        <button id="download">下载图片</button>
+        <button id="toggle">下载二进制文件</button>
+      </div>
+    </div>
+    <script src="./src/main.ts" type="module"></script>
+  </body>
+</html>
