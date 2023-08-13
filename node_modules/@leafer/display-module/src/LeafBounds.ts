@@ -1,0 +1,128 @@
+import { ILeafBoundsModule } from '@leafer/interface'
+import { BoundsHelper } from '@leafer/math'
+
+
+const { toOuterOf, copyAndSpread } = BoundsHelper
+
+export const LeafBounds: ILeafBoundsModule = {
+
+    __updateWorldBounds(): void {
+
+        if (this.__layout.boundsChanged) {
+
+            let resize: boolean
+            const layout = this.__layout
+
+
+            if (layout.boxChanged) {
+
+                this.__updatePath()
+                this.__updateRenderPath()
+
+                this.__updateBoxBounds()
+                layout.boxChanged = false
+                resize = true
+            }
+
+
+            if (layout.localBoxChanged) { // position change
+
+                this.__updateLocalBoxBounds()
+                layout.localBoxChanged = false
+
+                if (layout.strokeSpread) layout.strokeChanged = true
+                if (layout.renderSpread) layout.renderChanged = true
+                this.parent?.__layout.boxChange()
+            }
+
+
+            if (layout.strokeChanged) {
+
+                layout.strokeSpread = this.__updateStrokeSpread()
+
+                if (layout.strokeSpread) {
+
+                    if (layout.strokeBounds === layout.boxBounds) {
+                        layout.spreadStroke()
+                    }
+
+                    this.__updateStrokeBounds()
+                    this.__updateLocalStrokeBounds()
+
+                } else {
+                    layout.spreadStrokeCancel()
+                }
+
+                layout.strokeChanged = false
+                if (layout.renderSpread) layout.renderChanged = true
+
+                if (this.parent) this.parent.__layout.strokeChange()
+                resize || (resize = true)
+            }
+
+
+            if (layout.renderChanged) {
+
+                layout.renderSpread = this.__updateRenderSpread()
+
+                if (layout.renderSpread) {
+
+                    if (layout.renderBounds === layout.boxBounds || layout.renderBounds === layout.strokeBounds) {
+                        layout.spreadRender()
+                    }
+
+                    this.__updateRenderBounds()
+                    this.__updateLocalRenderBounds()
+
+                } else {
+                    layout.spreadRenderCancel()
+                }
+
+                layout.renderChanged = false
+
+                if (this.parent) this.parent.__layout.renderChange()
+            }
+
+
+            layout.boundsChanged = false
+
+            toOuterOf(this.__layout.renderBounds, this.__world, this.__world)
+
+            if (resize) this.__onUpdateSize()
+
+        } else {
+            toOuterOf(this.__layout.renderBounds, this.__world, this.__world)
+        }
+
+    },
+
+    __updateLocalBoxBounds(): void {
+        toOuterOf(this.__layout.boxBounds, this.__local, this.__local)
+    },
+
+    __updateLocalStrokeBounds(): void {
+        toOuterOf(this.__layout.strokeBounds, this.__local, this.__layout.localStrokeBounds)
+    },
+
+    __updateLocalRenderBounds(): void {
+        toOuterOf(this.__layout.renderBounds, this.__local, this.__layout.localRenderBounds)
+    },
+
+
+    __updateBoxBounds(): void {
+        const b = this.__layout.boxBounds
+        b.x = 0
+        b.y = 0
+        b.width = this.__.width
+        b.height = this.__.height
+    },
+
+    __updateStrokeBounds(): void {
+        copyAndSpread(this.__layout.strokeBounds, this.__layout.boxBounds, this.__layout.strokeSpread)
+    },
+
+    __updateRenderBounds(): void {
+        copyAndSpread(this.__layout.renderBounds, this.__layout.strokeBounds, this.__layout.renderSpread)
+    },
+
+}
